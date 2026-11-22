@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from .models import articulo, revision
-from .services import calc, procesar
+from .services import calcular_promedio_calificaciones, procesar_articulo
 
 # OJO: si en tu refactor renombras un modelo, un campo o una funcion,
 # actualiza tambien los nombres aqui. Lo que NO puede cambiar es el
@@ -23,13 +23,13 @@ class PruebasMiniConf(TestCase):
         self.assertEqual(self.art.estado, "enviado")
 
     def test_promedio(self):
-        self.assertEqual(calc(2, [4, 5, 3]), 4.0)
-        self.assertEqual(calc(2, []), 0)
+        self.assertEqual(calcular_promedio_calificaciones([4, 5, 3]), 4.0)
+        self.assertEqual(calcular_promedio_calificaciones([]), 0)
 
     def test_procesar_acepta_con_buen_promedio(self):
         revision.objects.create(art=self.art, nota=5)
         revision.objects.create(art=self.art, nota=4)
-        procesar(self.art)
+        procesar_articulo(self.art)
         self.assertEqual(self.art.estado, "aceptado")
 
     def test_lista_responde_200(self):
