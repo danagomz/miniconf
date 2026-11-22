@@ -1,6 +1,6 @@
+"""Lógica de negocio de MiniConf: validación, promedios y estado de artículos."""
 
 from .models import articulo, revision
-
 
 DECIMALES_PROMEDIO = 2
 NOTA_MINIMA = 1
@@ -28,6 +28,7 @@ def calcular_promedio_calificaciones(
 
     Returns:
         El promedio redondeado o 0 si la lista está vacía.
+
     """
     if not calificaciones:
         return 0.0
@@ -44,6 +45,7 @@ def validar_articulo(articulo_actual: articulo) -> bool:
 
     Returns:
         True si cumple las condiciones de validación, False en caso contrario.
+
     """
     titulo = articulo_actual.Titulo
     resumen = articulo_actual.resumen
@@ -67,6 +69,7 @@ def obtener_calificaciones_validas(
 
     Returns:
         Lista de notas entre la nota mínima y la máxima permitida.
+
     """
     return list(
         revision.objects.filter(
@@ -99,6 +102,7 @@ def procesar_articulo(articulo_actual: articulo) -> bool:
 
     Returns:
         True si el artículo fue procesado, False si no es válido.
+
     """
     if not validar_articulo(articulo_actual):
         return False
