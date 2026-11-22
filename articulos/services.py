@@ -12,6 +12,9 @@ ESTADO_ACEPTADO = "aceptado"
 ESTADO_EN_REVISION = "en revision"
 ESTADO_RECHAZADO = "rechazado"
 
+PROMEDIO_MINIMO_ACEPTACION = 4
+PROMEDIO_MINIMO_REVISION = 3
+
 
 def calcular_promedio_calificaciones(
     calificaciones: list[int],
@@ -73,21 +76,16 @@ def obtener_calificaciones_validas(
         ).values_list("nota", flat=True)
     )
 
+
 def actualizar_estado_articulo(
     articulo_actual: articulo,
     promedio: float,
     cantidad_calificaciones: int,
 ) -> None:
-    """Actualiza el estado del artículo según el promedio de sus calificaciones.
-
-    Args:
-        articulo_actual: Artículo cuyo estado se actualizará.
-        promedio: Promedio de las calificaciones válidas.
-        cantidad_calificaciones: Cantidad de calificaciones válidas.
-    """
-    if promedio >= 4:
+    """Actualiza el estado del artículo según el promedio de sus calificaciones."""
+    if promedio >= PROMEDIO_MINIMO_ACEPTACION:
         articulo_actual.estado = ESTADO_ACEPTADO
-    elif promedio >= 3:
+    elif promedio >= PROMEDIO_MINIMO_REVISION:
         articulo_actual.estado = ESTADO_EN_REVISION
     elif cantidad_calificaciones > 0:
         articulo_actual.estado = ESTADO_RECHAZADO
