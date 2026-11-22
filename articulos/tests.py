@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from .models import articulo, revision
+from .models import Articulo, Revision
 from .services import calcular_promedio_calificaciones, procesar_articulo
 
 # OJO: si en tu refactor renombras un modelo, un campo o una funcion,
@@ -12,14 +12,14 @@ from .services import calcular_promedio_calificaciones, procesar_articulo
 class PruebasMiniConf(TestCase):
     def setUp(self):
         self.autor = User.objects.create_user("autor1", "autor1@correo.com", "clave12345")
-        self.art = articulo.objects.create(
-            Titulo="Redes neuronales en agricultura",
+        self.art = Articulo.objects.create(
+            titulo="Redes neuronales en agricultura",
             resumen="Un resumen suficientemente largo para la prueba.",
-            a=self.autor,
+            autor=self.autor,
         )
 
     def test_crear_articulo(self):
-        self.assertEqual(articulo.objects.count(), 1)
+        self.assertEqual(Articulo.objects.count(), 1)
         self.assertEqual(self.art.estado, "enviado")
 
     def test_promedio(self):
@@ -27,26 +27,26 @@ class PruebasMiniConf(TestCase):
         self.assertEqual(calcular_promedio_calificaciones([]), 0)
 
     def test_procesar_acepta_con_buen_promedio(self):
-        revision.objects.create(art=self.art, nota=5)
-        revision.objects.create(art=self.art, nota=4)
+        Revision.objects.create(articulo=self.art, nota=5)
+        Revision.objects.create(articulo=self.art, nota=4)
         procesar_articulo(self.art)
         self.assertEqual(self.art.estado, "aceptado")
 
     def test_lista_responde_200(self):
-        revision.objects.create(art=self.art, nota=3)
+        Revision.objects.create(articulo=self.art, nota=3)
         respuesta = self.client.get("/api/articulos/")
         self.assertEqual(respuesta.status_code, 200)
         self.assertContains(respuesta, "Redes neuronales en agricultura")
 
     def test_crear_por_api(self):
         self.client.force_login(self.autor)
-        datos = {"Titulo": "vision por computador", "resumen": "Un resumen de prueba para la API."}
+        datos = {"titulo": "vision por computador", "resumen": "Un resumen de prueba para la API."}
         respuesta = self.client.post("/api/articulos/", datos, content_type="application/json")
         self.assertEqual(respuesta.status_code, 201)
-        self.assertEqual(articulo.objects.count(), 2)
+        self.assertEqual(Articulo.objects.count(), 2)
 
     def test_api_rechaza_titulo_vacio(self):
         self.client.force_login(self.autor)
-        datos = {"Titulo": "", "resumen": "Un resumen cualquiera"}
+        datos = {"titulo": "", "resumen": "Un resumen cualquiera"}
         respuesta = self.client.post("/api/articulos/", datos, content_type="application/json")
         self.assertEqual(respuesta.status_code, 400)
