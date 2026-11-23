@@ -1,6 +1,6 @@
 # MiniConf
 
-API en Django REST Framework escrita mal a propósito para la Demo-exposición 9. Cada uno limpia su parte.
+API en Django REST Framework para la Demo-exposición 9. Empezó escrita mal a propósito (rama `codigo-sucio`) y cada integrante limpió su parte.
 
 ## Correr el proyecto
 
@@ -8,8 +8,14 @@ API en Django REST Framework escrita mal a propósito para la Demo-exposición 9
 python -m venv venv
 venv\Scripts\activate          # Windows
 # source venv/bin/activate     # Mac / Linux
- 
+
 pip install -r requirements.txt
+copy .env.example .env         # Windows  (Mac / Linux: cp .env.example .env)
+```
+
+Abre `.env` y cambia `DJANGO_SECRET_KEY` por cualquier texto largo. Después:
+
+```bash
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
@@ -17,13 +23,14 @@ python manage.py runserver
 
 - Admin (para crear artículos y revisiones): http://127.0.0.1:8000/admin/
 - API: http://127.0.0.1:8000/api/articulos/
+
 ## Tests
 
 ```bash
 python manage.py test
 ```
 
-Deben salir **OK (6 tests)** antes y después de tu refactor.
+Deben salir **OK (6 tests)**.
 
 ## Contador de errores
 
@@ -31,9 +38,28 @@ Deben salir **OK (6 tests)** antes y después de tu refactor.
 ruff check . --isolated --preview --select E,W,F,I,N,D,ANN,DJ --ignore D203,D213 --extend-exclude migrations --statistics
 ```
 
-En `codigo-sucio` da **Found 256 errors**.
+| Etapa | Tag | Errores |
+| --- | --- | --- |
+| Código sucio | `v0-sucio` | 256 |
+| PEP 8 | `v1-pep8` | 198 |
+| Código legible | `v2-legible` | 155 |
+| Estándares de Django | `v3-django` | 49 |
+| Automatización | `v4-automatizado` | 0 |
 
-## Para trabajar
+## Revisión automática
 
-- No toques la rama `codigo-sucio`.
-- Crea tu rama desde `main`, cambia solo tus archivos y fusiona en tu fecha (ver el doc del grupo).
+La configuración de Ruff está en `pyproject.toml`. Para revisar y formatear todo el proyecto:
+
+```bash
+ruff check .
+ruff format .
+```
+
+Para que Ruff revise cada commit antes de guardarlo (una sola vez por computador):
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+En GitHub, el workflow `.github/workflows/calidad.yml` corre Ruff y los tests en cada push y pull request.
