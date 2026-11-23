@@ -1,0 +1,26 @@
+name: Calidad del código
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  calidad:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SECRET_KEY: clave-solo-para-ci
+      DJANGO_DEBUG: "False"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+      - name: Ruff (estándares)
+        run: ruff check .
+      - name: Ruff (formato)
+        run: ruff format --check .
+      - name: Tests
+        run: python manage.py test
